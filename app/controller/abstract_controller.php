@@ -9,19 +9,9 @@
 abstract class abstract_controller {
 	
 	/**
-	 * Consits of all GET and POST parameters.
-	 * 
-	 * @var array
-	 */
-	protected $request_params;
-	
-	/**
 	 * Constuctor of the class "controller".
-	 * 
-	 * @param array $request_params
 	 */
-	public function __construct(array $request_params) {
-		$this->request_params = $request_params;
+	public function __construct() {
 	}
 	
 	/**

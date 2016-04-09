@@ -74,10 +74,22 @@ abstract class abstract_data_object {
 		return $result;
 	}
 	
-	protected function insertRecord() {
+	protected function executeSqlQueryNoReturn() {
 		if (!$this->hasConnection()) return;
 		
 		mysqli_query($this->databaseConnection, $sql);
+	}
+	
+	protected static function randomCode($length){
+		$charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		$result = '';
+	
+		for ($i = 0; $i < $length; $i++) {
+			$randomNumber = floor(mt_rand() % strlen($charset));
+			$result = $result . substr($charset, $randomNumber, 1);
+		}
+	
+		return $result;
 	}
 }
 ?>

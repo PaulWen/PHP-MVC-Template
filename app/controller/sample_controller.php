@@ -1,9 +1,11 @@
 <?php
 class sample_controller extends abstract_controller {
 	
-	public function __construct(array $request_params) {
+	private $groupeId;
+	
+	public function __construct($groupeId) {
 		// call super constructor
-		parent::__construct ($request_params);
+		$this->groupeId = $groupeId;
 	}
 	
 	

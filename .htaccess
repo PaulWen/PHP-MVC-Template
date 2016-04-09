@@ -1,7 +1,7 @@
 Options -MultiViews
 
 RewriteEngine On
-RewriteBase /php%20workspace/MVC%20PHP/
+RewriteBase /MVC%20PHP/
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f

@@ -35,14 +35,13 @@ require_once 'app/model/user_data_object.php';
 
 //default controller
 define("DEFAULT_CONTROLLER", "sample_controller");
+define("DEFAULT_DOMAIN", "/MVC%20PHP/");
 
 // set default values
 /** Stores the controller from the split URL */
 $controller = DEFAULT_CONTROLLER;
 /** Stores the method from the split URL */
 $function = 'index';
-/** Stores the parameters from the split URL */
-$params = [];
 
 // parse url
 if (isset ($_GET['url'])) {
@@ -52,38 +51,56 @@ if (isset ($_GET['url'])) {
 
 // set controller
 if (isset ($url[0])) {
+	// test if the wanted controller is given
 	if (file_exists('app/controller/' . $url[0] . '.php')) {
 		// if a valid controller is given use it as the controller
 		$controller = $url[0];
-		unset($url[0]);
 	} else {
-		// if $url[] is not a valid controller name for the selected controller,
-		// or the index-function gets called, redirect the client so that the URL
-		// gets shown accuratly
-		header("Location: /php%20workspace/MVC%20PHP/". DEFAULT_CONTROLLER);
+		// if $url[] is not a valid controller name for the selected controller
+		// redirect the client to the home page
+		header("Location: " . DEFAULT_DOMAIN. DEFAULT_CONTROLLER);
 	}
 }
 // load the wanted controller class
 require_once 'app/controller/' . $controller . '.php';
-//creates on object of the controller
-$controller = new $controller(array_merge($_GET, $_POST));
 
-// set function
-if (isset($url[1])) {
-	if(method_exists($controller, $url[1]) && $url[1] != "index") {
-		$function = $url[1];
-		unset($url[1]);
-	} else {
-		// if $url[1] is not a valid function name for the selected controller,
-		// or the index-function gets called, redirect the client so that the URL
-		// gets shown accuratly
-		header("Location: /php%20workspace/MVC%20PHP/". DEFAULT_CONTROLLER);
-	}
+// check if the controller needs a parameter and if in the url a parameter is given
+$contructorOfController = new ReflectionMethod($controller, '__construct');
+$constructorHasParameter = sizeof($contructorOfController->getParameters()) == 1;
+if ($constructorHasParameter && !isset($url[1])) {
+	// if there are not enough parameter given redirect the client to the default page 
+	header("Location: " . DEFAULT_DOMAIN. DEFAULT_CONTROLLER);
 }
 
-// set parameters
-if (isset($url)) {
-	$params = array_values($url);
+if ($constructorHasParameter) {
+	//creates on object of the controller
+	$controller = new $controller($url[1]);
+} else {
+	//creates on object of the controller
+	$controller = new $controller();
+}
+
+// set function
+if ($constructorHasParameter) {
+	if (isset($url[2])) {
+		if(method_exists($controller, $url[2])) {
+			$function = $url[2];
+		} else {
+			// if $url[1] is not a valid function name for the selected controller,
+			// redirect the client so that the URL gets shown accuratly
+			header("Location: " . DEFAULT_DOMAIN. DEFAULT_CONTROLLER);
+		}
+	}
+} else {
+	if (isset($url[1])) {
+		if(method_exists($controller, $url[1])) {
+			$function = $url[1];
+		} else {
+			// if $url[1] is not a valid function name for the selected controller,
+			// redirect the client so that the URL gets shown accuratly
+			header("Location: " . DEFAULT_DOMAIN. DEFAULT_CONTROLLER);
+		}
+	}
 }
 
 ////////////////////////Authentication////////////////////////
@@ -98,9 +115,9 @@ if (isset($_SESSION["username"])) {
 // check, if the user is allowed to access the wanted controller
 if ($controller->authenticate($usertype)) {
 	// if user is allowed run the controller function
-	call_user_func_array([$controller, $function], $params);
+	call_user_func([$controller, $function]);
 } else {
 	// if user is not allowed to call the controller then link him to the default page
-	header("Location: /php%20workspace/MVC%20PHP/". DEFAULT_CONTROLLER);
+	header("Location: " . DEFAULT_DOMAIN. DEFAULT_CONTROLLER);
 }
 ?>
